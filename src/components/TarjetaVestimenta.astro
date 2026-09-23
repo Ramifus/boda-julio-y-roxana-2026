@@ -1,0 +1,105 @@
+---
+---
+<div class="tarjeta-vestimenta w-full">
+  <div class="bg-[#4d5441] shadow-xl overflow-hidden">
+    <div class="px-3 pt-4 pb-8 text-center">
+
+      <h2 class="font-cormorant text-base text-[#c8b194] uppercase font-semibold leading-tight mb-1">
+        Vestimenta
+      </h2>
+
+      <div class="flex items-center gap-2 mb-2">
+        <div class="flex-1 h-px bg-[#c8b194]/40"></div>
+        <span class="text-[#c8b194]/60 text-[10px]">✦</span>
+        <div class="flex-1 h-px bg-[#c8b194]/40"></div>
+      </div>
+
+      <div class="flex justify-center mb-1">
+        <img src="/iconos/vestido-de-novia.png" alt="Vestimenta" class="w-9 h-9 object-contain dorado-filter" />
+      </div>
+
+      <div class="inline-block border border-[#c8b194]/50 rounded-full px-5 py-0.5 mb-2">
+        <p class="font-cormorant text-sm text-[#c8b194] uppercase font-semibold">Formal</p>
+      </div>
+
+      {/* ═══ TONOS RESERVADOS PARA LA NOVIA ═══ */}
+      <p class="font-cormorant text-xs text-white/85 leading-snug px-1 mb-2">
+        Reservamos el blanco, beige y tonos similares para la novia
+      </p>
+
+      <div class="flex justify-center items-center gap-2">
+        <span class="circulo-tono" style="background: #ffffff; animation-delay: 0s;" title="Blanco"></span>
+        <span class="circulo-tono" style="background: #fdfaf3; animation-delay: 0.3s;" title="Marfil"></span>
+        <span class="circulo-tono" style="background: #f3e9d8; animation-delay: 0.6s;" title="Crema"></span>
+        <span class="circulo-tono" style="background: #e8dcc4; animation-delay: 0.9s;" title="Beige"></span>
+        <span class="circulo-tono" style="background: #dccdb0; animation-delay: 1.2s;" title="Arena"></span>
+      </div>
+
+      {/* ═══ DETALLE DE VESTIMENTA COMENTADO — sólo se muestra "Formal".
+             Para volver a mostrarlo, quitar este bloque de comentario. ═══
+
+      <p class="font-cormorant text-sm text-white/90 leading-tight">Caballeros con traje</p>
+      <p class="font-cormorant text-sm text-white/90 leading-tight mb-2">Damas con vestido largo</p>
+
+      <div class="flex items-center gap-2 mb-1">
+        <div class="flex-1 h-px bg-[#c8b194]/40"></div>
+        <span class="text-[#c8b194]/60 text-[10px]">✦</span>
+        <div class="flex-1 h-px bg-[#c8b194]/40"></div>
+      </div>
+
+      <p class="font-cormorant text-xs text-white/60 italic mb-1">Agradecemos evitar:</p>
+      <div class="flex justify-center gap-5">
+        <div class="flex flex-col items-center gap-0.5">
+          <div class="w-6 h-6 rounded-full bg-white border border-white/50 shadow"></div>
+          <p class="font-cormorant text-xs text-white/60">Blanco</p>
+        </div>
+        <div class="flex flex-col items-center gap-0.5">
+          <div class="w-6 h-6 rounded-full bg-[#2e5248] border border-[#c8b194]/30 shadow"></div>
+          <p class="font-cormorant text-xs text-white/60">Verde</p>
+        </div>
+      </div>
+
+      ═══ FIN DETALLE COMENTADO ═══ */}
+
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Círculos de tonos reservados para la novia */
+  .circulo-tono {
+    display: inline-block;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(200, 177, 148, 0.55);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    animation: brillo-tono 4s ease-in-out infinite;
+  }
+
+  @keyframes brillo-tono {
+    0%,
+    100% {
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    }
+    50% {
+      box-shadow: 0 0 8px rgba(200, 177, 148, 0.75);
+    }
+  }
+
+  .dorado-filter {
+    filter: brightness(0) saturate(100%) invert(73%) sepia(18%) saturate(500%) hue-rotate(345deg) brightness(102%) contrast(90%);
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.fromTo(".tarjeta-vestimenta",
+    { opacity: 0, y: 40 },
+    { opacity: 1, y: 0, duration: 1, ease: "power3.out",
+      scrollTrigger: { trigger: ".tarjeta-vestimenta", start: "top 90%", toggleActions: "play none none reset" }
+    }
+  );
+</script>

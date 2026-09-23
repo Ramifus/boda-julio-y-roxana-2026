@@ -1,0 +1,91 @@
+---
+// FotoPolaroid.astro — Foto con marco polaroid y rotación (estilo foto3.png)
+interface Props {
+  src: string;
+  alt?: string;
+  rotacion?: number;
+  /** true = muestra la imagen en su proporción original, sin recortarla a 4/3 */
+  sinRecorte?: boolean;
+}
+
+const {
+  src,
+  alt = "Rodrigo y Camila",
+  rotacion = -4,
+  sinRecorte = false,
+} = Astro.props;
+---
+
+<div class="polaroid-wrap" style={`--rot: ${rotacion}deg;`}>
+  <div class="polaroid">
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      class={sinRecorte ? "natural" : ""}
+    />
+  </div>
+</div>
+
+<style>
+  .polaroid-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 1.5rem 0;
+  }
+
+  .polaroid {
+    width: 100%;
+    background: linear-gradient(160deg, #fdfbf6 0%, #f5efe3 100%);
+    padding: 0.6rem 0.6rem 2.4rem;
+    box-shadow:
+      0 10px 26px rgba(77, 84, 65, 0.28),
+      0 2px 6px rgba(0, 0, 0, 0.12);
+    transform: rotate(var(--rot));
+    transform-origin: center;
+  }
+
+  .polaroid img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  /* Sin recorte: respeta el tamaño/proporción original de la imagen */
+  .polaroid img.natural {
+    aspect-ratio: auto;
+    height: auto;
+    object-fit: contain;
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll<HTMLElement>(".polaroid-wrap").forEach((wrap) => {
+    const rot = wrap.style.getPropertyValue("--rot") || "0deg";
+    const signo = rot.trim().startsWith("-") ? -1 : 1;
+
+    gsap.fromTo(
+      wrap.querySelector(".polaroid"),
+      { opacity: 0, y: 40, rotation: 0 },
+      {
+        opacity: 1,
+        y: 0,
+        rotation: parseFloat(rot),
+        duration: 1.2,
+        ease: "power3.out",
+        delay: signo > 0 ? 0.15 : 0,
+        scrollTrigger: {
+          trigger: wrap,
+          start: "top 90%",
+          toggleActions: "play none none reset",
+        },
+      },
+    );
+  });
+</script>

@@ -1,0 +1,241 @@
+---
+// Confirmación de asistencia — un botón abre el formulario con el nombre del
+// invitado y sus pases. Por ahora es solo diseño: todavía no guarda nada.
+import { etiquetaPases } from "../lib/pases";
+
+interface Props {
+  nombre?: string | null;
+  pases?: number;
+}
+
+const { nombre = null, pases = 1 } = Astro.props;
+---
+
+<div class="tarjeta-confirmar w-full">
+
+  <div class="bg-[#f5f0e8] shadow-xl overflow-hidden" style="border-radius: 90px 90px 0 0;">
+    <div class="px-3 pt-6 pb-20 text-center">
+
+      <!-- Icono -->
+      <div class="flex justify-center mb-2">
+        <svg class="w-9 h-9" viewBox="0 0 24 24" fill="#4d5441">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+      </div>
+
+      <h2 class="font-cormorant text-base text-[#c8b194] uppercase font-semibold leading-tight mb-1">Confirmar Asistencia</h2>
+
+      <div class="flex items-center gap-2 mb-3">
+        <div class="flex-1 h-px bg-[#c8b194]"></div>
+        <span class="text-[#c8b194] text-[10px]">✦</span>
+        <div class="flex-1 h-px bg-[#c8b194]"></div>
+      </div>
+
+      <p class="font-cormorant text-sm text-[#4d5441] leading-snug mb-4">
+        Por favor confirma tu asistencia haciendo click en el botón
+      </p>
+
+      <button type="button" id="abrir-confirmar"
+        class="inline-flex items-center justify-center bg-[#c8b194] text-white font-cormorant text-xs uppercase px-6 py-2 rounded-full hover:bg-[#c8b194]/90 transition-colors">
+        Confirmar asistencia
+      </button>
+
+      <!-- Aviso de lo que ya respondió (aparece después de responder) -->
+      <p id="aviso-confirmar" class="hidden items-center justify-center gap-1.5 font-cormorant text-sm text-[#4d5441] font-semibold leading-snug mt-3">
+        <svg class="w-4 h-4 text-[#c8b194] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4.5 4.5L19 7.5"/>
+        </svg>
+        <span class="aviso-texto"></span>
+      </p>
+
+    </div>
+  </div>
+
+  <!-- Formulario (se mueve al <body> al cargar para que quede fijo en pantalla) -->
+  <div id="modal-confirmar" class="fixed inset-0 z-[100] hidden items-center justify-center px-5" role="dialog" aria-modal="true" aria-labelledby="titulo-confirmar">
+    <div class="modal-fondo absolute inset-0 bg-black/55"></div>
+
+    <div class="modal-caja relative w-full max-w-[340px] bg-[#f5f0e8] shadow-2xl overflow-hidden" style="border-radius: 90px 90px 6px 6px;">
+      <div class="absolute inset-[7px] border border-[#c8b194]/45 pointer-events-none" style="border-radius: 84px 84px 3px 3px;"></div>
+
+      <button type="button" class="cerrar-confirmar absolute top-4 right-5 w-8 h-8 flex items-center justify-center text-[#4d5441]/70 hover:text-[#4d5441] z-10" aria-label="Cerrar">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/>
+        </svg>
+      </button>
+
+      <div class="relative px-7 pt-9 pb-8 text-center">
+
+        <div class="flex justify-center mb-2">
+          <svg class="w-9 h-9" viewBox="0 0 24 24" fill="#4d5441">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        </div>
+
+        <h2 id="titulo-confirmar" class="font-cormorant text-base text-[#c8b194] uppercase font-semibold leading-tight mb-2">Confirmar Asistencia</h2>
+
+        <div class="flex items-center gap-2 mb-4">
+          <div class="flex-1 h-px bg-[#c8b194]"></div>
+          <span class="text-[#c8b194] text-[10px]">✦</span>
+          <div class="flex-1 h-px bg-[#c8b194]"></div>
+        </div>
+
+        <p class="font-cormorant text-[13px] text-[#c8b194] uppercase tracking-[0.28em] mb-2">Invitación para</p>
+        <p class="font-soage text-[1.3rem] leading-tight text-[#4d5441] mb-4">{nombre}</p>
+
+        <div class="inline-flex items-center gap-2.5 border border-[#c8b194]/60 rounded-full px-6 py-2 mb-5">
+          <svg class="w-5 h-5 text-[#c8b194]" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M20 6h-2.18A3 3 0 0 0 18 5a3 3 0 0 0-5.24-2A5.6 5.6 0 0 0 12 3.9a5.6 5.6 0 0 0-.76-.9A3 3 0 0 0 6 5a3 3 0 0 0 .18 1H4a2 2 0 0 0-2 2v2a1 1 0 0 0 1 1v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a1 1 0 0 0 1-1V8a2 2 0 0 0-2-2Zm-5-2a1 1 0 1 1 0 2h-1.6C13.7 4.9 14.3 4 15 4ZM8 5a1 1 0 0 1 1-1c.7 0 1.3.9 1.6 2H9a1 1 0 0 1-1-1Zm3 14H5v-7h6Zm0-9H4V8h7Zm8 9h-6v-7h6Zm1-9h-7V8h7Z"/>
+          </svg>
+          <p class="font-cormorant text-base text-[#c8b194] uppercase tracking-[0.18em] font-semibold">
+            <span class="pases-modal">{pases}</span>
+            <span>{etiquetaPases(pases)}</span>
+          </p>
+        </div>
+
+        <!-- Pregunta y botones -->
+        <div class="paso-pregunta">
+          <p class="aviso-modal hidden font-cormorant text-sm text-[#4d5441] font-semibold bg-[#c8b194]/20 border border-[#c8b194]/50 rounded-lg px-3 py-2 mb-4"></p>
+          <p class="font-crimson italic text-base text-[#4d5441] leading-snug mb-5">
+            ¿Nos acompañarás en este día tan especial?
+          </p>
+          <div class="flex flex-col gap-2.5">
+            <button type="button" data-respuesta="si"
+              class="w-full bg-[#4d5441] text-white font-cormorant text-sm uppercase tracking-[0.15em] font-semibold py-2.5 rounded-full hover:bg-[#4d5441]/90 transition-colors">
+              Confirmar asistencia
+            </button>
+            <button type="button" data-respuesta="no"
+              class="w-full border border-[#c8b194] text-[#c8b194] font-cormorant text-sm uppercase tracking-[0.15em] font-semibold py-2.5 rounded-full hover:bg-[#c8b194]/10 transition-colors">
+              No podré asistir
+            </button>
+          </div>
+        </div>
+
+        <!-- Respuestas (solo visual por ahora) -->
+        <div class="paso-si hidden">
+          <p class="font-crimson italic text-lg text-[#4d5441] leading-snug">
+            ¡Gracias por confirmar!<br/>Te esperamos con mucho cariño.
+          </p>
+        </div>
+        <div class="paso-no hidden">
+          <p class="font-crimson italic text-lg text-[#4d5441] leading-snug">
+            Lamentamos que no puedas acompañarnos.<br/>¡Gracias por avisarnos!
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+  .pases-modal {
+    font-variant-numeric: lining-nums;
+    font-feature-settings: "lnum" 1;
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.fromTo(".tarjeta-confirmar",
+    { opacity: 0, y: 40 },
+    { opacity: 1, y: 0, duration: 1, ease: "power3.out",
+      scrollTrigger: { trigger: ".tarjeta-confirmar", start: "top 90%", toggleActions: "play none none reset" }
+    }
+  );
+
+  // ═══ FORMULARIO DE CONFIRMACIÓN ═══
+  // La tarjeta se anima con transform, y un elemento fijo dentro de algo
+  // transformado deja de quedar fijo en pantalla: por eso va al <body>.
+  const modal = document.getElementById("modal-confirmar");
+  const abrir = document.getElementById("abrir-confirmar");
+
+  if (modal && abrir) {
+    document.body.appendChild(modal);
+
+    const caja = modal.querySelector(".modal-caja");
+    const fondo = modal.querySelector(".modal-fondo");
+    const pasoPregunta = modal.querySelector(".paso-pregunta");
+    const pasoSi = modal.querySelector(".paso-si");
+    const pasoNo = modal.querySelector(".paso-no");
+
+    const mostrarPaso = (paso: Element | null) => {
+      [pasoPregunta, pasoSi, pasoNo].forEach((p) => p?.classList.add("hidden"));
+      paso?.classList.remove("hidden");
+    };
+
+    let cierreAutomatico: ReturnType<typeof setTimeout> | undefined;
+
+    const abrirModal = () => {
+      clearTimeout(cierreAutomatico);
+      mostrarPaso(pasoPregunta);
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      document.body.style.overflow = "hidden";
+      gsap.fromTo(fondo, { opacity: 0 }, { opacity: 1, duration: 0.3 });
+      gsap.fromTo(caja,
+        { opacity: 0, y: 30, scale: 0.96 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }
+      );
+    };
+
+    const cerrarModal = () => {
+      gsap.to(fondo, { opacity: 0, duration: 0.25 });
+      gsap.to(caja, {
+        opacity: 0, y: 20, duration: 0.25, ease: "power2.in",
+        onComplete: () => {
+          modal.classList.add("hidden");
+          modal.classList.remove("flex");
+          document.body.style.overflow = "";
+        },
+      });
+    };
+
+    abrir.addEventListener("click", abrirModal);
+    fondo?.addEventListener("click", cerrarModal);
+    modal.querySelector(".cerrar-confirmar")?.addEventListener("click", cerrarModal);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !modal.classList.contains("hidden")) cerrarModal();
+    });
+
+    // Por ahora la respuesta solo se recuerda mientras la página está abierta;
+    // más adelante se guardará en la base de datos.
+    const aviso = document.getElementById("aviso-confirmar");
+    const avisoTexto = aviso?.querySelector(".aviso-texto");
+    const avisoModal = modal.querySelector(".aviso-modal");
+
+    const TEXTO_AVISO = {
+      si: "Ya confirmaste tu asistencia",
+      no: "Nos avisaste que no podrás asistir",
+    };
+
+    modal.querySelectorAll("[data-respuesta]").forEach((boton) => {
+      boton.addEventListener("click", () => {
+        const respuesta = (boton as HTMLElement).dataset.respuesta === "si" ? "si" : "no";
+        mostrarPaso(respuesta === "si" ? pasoSi : pasoNo);
+
+        // Debajo del botón de la tarjeta
+        if (aviso && avisoTexto) {
+          avisoTexto.textContent = TEXTO_AVISO[respuesta];
+          aviso.classList.remove("hidden");
+          aviso.classList.add("flex");
+        }
+
+        // Si vuelve a abrir el formulario, se le recuerda lo que respondió
+        if (avisoModal) {
+          avisoModal.textContent = `${TEXTO_AVISO[respuesta]}. Si quieres, puedes cambiar tu respuesta.`;
+          avisoModal.classList.remove("hidden");
+        }
+
+        // Deja leer el agradecimiento y cierra, para que se vea el aviso
+        clearTimeout(cierreAutomatico);
+        cierreAutomatico = setTimeout(() => {
+          if (!modal.classList.contains("hidden")) cerrarModal();
+        }, 2200);
+      });
+    });
+  }
+</script>

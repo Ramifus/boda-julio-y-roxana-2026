@@ -1,0 +1,179 @@
+---
+// src/components/Invitacion.astro
+// Contenido completo de la invitación. Recibe el invitado como props para que
+// tanto la invitación genérica (/) como las personalizadas (/[slug]/) usen
+// exactamente el mismo diseño.
+interface Props {
+  /** Nombre del invitado. Si va vacío o null, se muestra la versión genérica. */
+  nombre?: string | null;
+  /** Cantidad de pases. */
+  pases?: number;
+}
+
+const { nombre = null, pases = 1 } = Astro.props;
+
+// TEMPORAL: invitado de muestra para ver el diseño hasta conectar la base de datos
+const nombreMuestra = nombre ?? "Lincon Sánchez y Esposa";
+const pasesMuestra = nombre ? pases : 2;
+
+import Layout from "../layouts/Layout.astro";
+import Portada from "./Portada.astro";
+import NombresFlores from "./NombresFlores.astro";
+import Dedicatoria from "./Dedicatoria.astro";
+import TarjetaFecha from "./TarjetaFecha.astro";
+import TarjetaCeremonia from "./TarjetaCeremonia.astro";
+import TarjetaVersiculoAmor from "./TarjetaVersiculoAmor.astro";
+import TarjetaInvitado from "./TarjetaInvitado.astro";
+import TarjetaRecepcion from "./TarjetaRecepcion.astro";
+import TarjetaItinerario from "./TarjetaItinerario.astro";
+import FotoPolaroid from "./FotoPolaroid.astro";
+import TarjetaVestimenta from "./TarjetaVestimenta.astro";
+import TarjetaRegalos from "./TarjetaRegalos.astro";
+import TarjetaProhibido from "./TarjetaProhibido.astro";
+import TarjetaConfirmar from "./TarjetaConfirmar.astro";
+import TarjetaDespedida from "./TarjetaDespedida.astro";
+import Versiculo from "./versiculo.astro";
+---
+
+<Layout title="Rodrigo & Camila">
+    {/* TEMPORAL mientras se trabaja: volver a activar antes de entregar */}
+    {/* <Portada /> */}
+
+    <div id="contenido-principal">
+        <!-- 1. NOMBRES DE LOS NOVIOS -->
+        <NombresFlores />
+
+        <!-- 2. ¡NOS CASAMOS! -->
+        <Dedicatoria />
+
+        <section class="relative pt-0 pb-28 overflow-hidden -mt-24 z-10">
+            <div
+                class="relative mx-auto"
+                style="max-width:380px; padding: 0 10px;"
+            >
+                <!-- 2b. NOMBRE DEL INVITADO — centrada, debajo de la foto -->
+                <div
+                    class="relative z-0 w-[82%] mx-auto"
+                    style="margin-top: 16px;"
+                >
+                    <TarjetaInvitado nombre={nombreMuestra} pases={pasesMuestra} />
+                </div>
+
+                <!-- 3. APARTA LA FECHA + CUENTA REGRESIVA — izquierda -->
+                <div
+                    class="relative z-[1] w-[58%] mr-auto"
+                    style="margin-top: -20px;"
+                >
+                    <TarjetaFecha />
+                </div>
+
+                <!-- 4. BENDICIÓN Y NUESTROS PADRES — derecha -->
+                <div
+                    class="relative z-[2] w-[58%] ml-auto"
+                    style="margin-top: -40px;"
+                >
+                    <TarjetaCeremonia />
+                </div>
+
+                <!-- 5. VERSÍCULO 1 CORINTIOS 13:7 — izquierda -->
+                <div
+                    class="relative z-[3] w-[58%] mr-auto"
+                    style="margin-top: -30px;"
+                >
+                    <TarjetaVersiculoAmor />
+                </div>
+
+                <!-- 6. CEREMONIA Y RECEPCIÓN — derecha -->
+                <div
+                    class="relative z-[4] w-[58%] ml-auto"
+                    style="margin-top: -40px;"
+                >
+                    <TarjetaRecepcion />
+                </div>
+
+                <!-- 7. ITINERARIO — izquierda -->
+                <div
+                    class="relative z-[5] w-[58%] mr-auto"
+                    style="margin-top: -20px;"
+                >
+                    <TarjetaItinerario />
+                </div>
+
+                <!-- 7b. FOTOS POLAROID — entre itinerario y vestimenta -->
+                <div
+                    class="relative z-[6] w-[62%] ml-auto"
+                    style="margin-top: -55px;"
+                >
+                    <FotoPolaroid src="/imagenes/foto3.webp" rotacion={-5} />
+                </div>
+
+                <div
+                    class="relative z-[6] w-[62%] mr-auto"
+                    style="margin-top: -70px;"
+                >
+                    <FotoPolaroid src="/imagenes/foto4.webp" rotacion={5} />
+                </div>
+
+                <!-- 8. VESTIMENTA — derecha -->
+                <div
+                    class="relative z-[6] w-[45%] ml-auto"
+                    style="margin-top: -60px;"
+                >
+                    <TarjetaVestimenta />
+                </div>
+
+                <!-- 9. SUGERENCIA DE REGALO (QR + LLUVIA DE SOBRES) — izquierda -->
+                <div
+                    class="relative z-[7] w-[58%] mr-auto"
+                    style="margin-top: -60px;"
+                >
+                    <TarjetaRegalos />
+                </div>
+
+                <!-- 11. SÓLO ADULTOS — derecha -->
+                <div
+                    class="relative z-[9] w-[45%] ml-auto"
+                    style="margin-top: -20px;"
+                >
+                    <TarjetaProhibido />
+                </div>
+
+                <!-- 12. CONFIRMAR — izquierda -->
+                <div
+                    class="relative z-[10] w-[58%] mr-auto"
+                    style="margin-top: -100px;"
+                >
+                    <TarjetaConfirmar nombre={nombreMuestra} pases={pasesMuestra} />
+                </div>
+
+                <!-- 12b. FOTO HORIZONTAL — debajo de confirmar asistencia -->
+                <div
+                    class="relative z-[11] w-[92%] mx-auto"
+                    style="margin-top: -55px;"
+                >
+                    <FotoPolaroid
+                        src="/imagenes/foto5.webp"
+                        rotacion={4}
+                        sinRecorte
+                    />
+                </div>
+
+                <!-- 15. MENSAJE A FAMILIA Y AMIGOS — izquierda -->
+                <div
+                    class="relative z-[13] w-[58%] mr-auto"
+                    style="margin-top: -40px;"
+                >
+                    <TarjetaDespedida />
+                </div>
+
+                <!-- 16. VERSÍCULO FINAL (ECLESIASTÉS 3:11) — derecha -->
+                <div
+                    class="relative z-[14] w-[58%] ml-auto"
+                    style="margin-top: -20px;"
+                >
+                    <Versiculo />
+                </div>
+            </div>
+        </section>
+    </div>
+</Layout>
