@@ -36,7 +36,8 @@ import Versiculo from "./versiculo.astro";
 ---
 
 <Layout title="Julio & Roxana">
-    <Portada />
+    {/* TEMPORAL mientras se trabaja: volver a activar antes de entregar */}
+    {/* <Portada /> */}
 
     <div id="contenido-principal">
         <!-- 1. NOMBRES DE LOS NOVIOS -->
@@ -82,41 +83,17 @@ import Versiculo from "./versiculo.astro";
                     <TarjetaVersiculoAmor />
                 </div>
 
-                <!-- 6. CEREMONIA RELIGIOSA — derecha -->
+                <!-- 6. CEREMONIA Y RECEPCIÓN — derecha -->
                 <div
                     class="relative z-[4] w-[58%] ml-auto"
                     style="margin-top: -40px;"
                 >
-                    <TarjetaRecepcion
-                        titulo={["Ceremonia", "Religiosa"]}
-                        hora="17:00 hrs."
-                        lugar="Parroquia<br/>San Agustín"
-                        direccion="Barrio San Agustín, Calle 6"
-                        ubicacion="https://maps.app.goo.gl/jDfRJ9Xp9wvaSvW28"
-                        icono="/iconos/iglesia2.png"
-                        hojas="der"
-                    />
+                    <TarjetaRecepcion />
                 </div>
 
-                <!-- 6b. RECEPCIÓN SOCIAL — izquierda -->
+                <!-- 7. ITINERARIO — izquierda -->
                 <div
                     class="relative z-[5] w-[58%] mr-auto"
-                    style="margin-top: -20px;"
-                >
-                    <TarjetaRecepcion
-                        titulo={["Recepción", "Social"]}
-                        hora="18:00 hrs."
-                        lugar="Marbella<br/>Salón de Eventos"
-                        direccion="Av. Santos Dumont"
-                        ubicacion="https://maps.app.goo.gl/PyZyEH52oRQ1gYK98"
-                        icono="/iconos/recepcion.png"
-                        hojas="izq"
-                    />
-                </div>
-
-                <!-- 7. ITINERARIO — derecha -->
-                <div
-                    class="relative z-[5] w-[58%] ml-auto"
                     style="margin-top: -20px;"
                 >
                     <TarjetaItinerario />
@@ -130,33 +107,33 @@ import Versiculo from "./versiculo.astro";
                     <FotoPolaroid src="/imagenes/foto3.webp" rotacion={-4} />
                 </div>
 
-                <!-- 8. VESTIMENTA — izquierda -->
+                <!-- 8. VESTIMENTA — derecha -->
                 <div
-                    class="relative z-[6] w-[45%] mr-auto"
+                    class="relative z-[6] w-[45%] ml-auto"
                     style="margin-top: -60px;"
                 >
                     <TarjetaVestimenta />
                 </div>
 
-                <!-- 9. SUGERENCIA DE REGALO (QR + LLUVIA DE SOBRES) — derecha -->
+                <!-- 9. SUGERENCIA DE REGALO (QR + LLUVIA DE SOBRES) — izquierda -->
                 <div
-                    class="relative z-[7] w-[58%] ml-auto"
+                    class="relative z-[7] w-[58%] mr-auto"
                     style="margin-top: -60px;"
                 >
                     <TarjetaRegalos />
                 </div>
 
-                <!-- 11. SÓLO ADULTOS — izquierda -->
+                <!-- 11. SÓLO ADULTOS — derecha -->
                 <div
-                    class="relative z-[9] w-[58%] mr-auto"
+                    class="relative z-[9] w-[45%] ml-auto"
                     style="margin-top: -20px;"
                 >
                     <TarjetaProhibido />
                 </div>
 
-                <!-- 12. CONFIRMAR — derecha -->
+                <!-- 12. CONFIRMAR — izquierda -->
                 <div
-                    class="relative z-[10] w-[58%] ml-auto"
+                    class="relative z-[10] w-[58%] mr-auto"
                     style="margin-top: -100px;"
                 >
                     <TarjetaConfirmar nombre={nombreMuestra} pases={pasesMuestra} />

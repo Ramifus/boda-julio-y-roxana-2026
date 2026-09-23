@@ -10,14 +10,10 @@
     <!-- SOBRE - fondo que ocupa todo el ancho de la pantalla -->
     <img
         id="sobre-img"
-        src="/imagenes/sobreportada.webp"
+        src="/imagenes/sobreportada.png"
         alt="Sobre de invitación"
-        class="absolute top-0 left-0 w-full h-full object-cover object-center"
+        class="absolute top-0 left-0 w-full h-full object-cover object-top"
     />
-    <!-- object-center: la punta de la solapa está justo a la mitad de la
-         imagen, así que queda siempre a la mitad de la pantalla, donde va el
-         sello, sea celular o computadora. Con object-top, en pantallas más
-         anchas la punta bajaba y el sello quedaba arriba de ella. -->
 
     <!-- SELLO / BOTÓN - centrado sobre la imagen -->
     <div class="absolute inset-0 flex items-center justify-center z-20">
@@ -37,7 +33,7 @@
     <!-- TEXTO - posicionado sobre la portada -->
     <div
         id="texto-portada"
-        class="absolute top-[calc(50%+4.5rem)] left-0 right-0 text-center z-20 px-6 flex flex-col items-center"
+        class="absolute bottom-[12%] left-0 right-0 text-center z-20 px-6 flex flex-col items-center"
     >
         <p
             class="font-cormorant uppercase tracking-[0.32em] text-sm md:text-base font-semibold"
@@ -61,24 +57,15 @@
             class="font-soage text-3xl md:text-4xl mt-2 leading-tight"
             style="color: #c8b194;"
         >
-            Julio<br/>
+            Rodrigo<br/>
             <span class="font-cormorant text-xl" style="color: #4d5441;">&</span><br/>
-            Roxana
+            Camila
         </h2>
     </div>
 </section>
 
 <script>
     import { gsap } from "gsap";
-
-    // ═══ AL RECARGAR SIEMPRE SE EMPIEZA DESDE ARRIBA ═══
-    // Evita que el navegador restaure la posición del scroll y que, al abrir
-    // el sobre, el invitado caiga a la mitad de la invitación.
-    if ("scrollRestoration" in history) {
-        history.scrollRestoration = "manual";
-    }
-    window.scrollTo(0, 0);
-    window.addEventListener("load", () => window.scrollTo(0, 0));
 
     document.addEventListener("DOMContentLoaded", () => {
         const btnSello = document.getElementById("btn-sello");
@@ -108,10 +95,6 @@
         });
 
         btnSello?.addEventListener("click", () => {
-            // Siempre entra por el inicio (NombresFlores), sin importar
-            // dónde estaba el scroll antes de recargar.
-            window.scrollTo(0, 0);
-
             const audio = new Audio("/musica/melodia.mp3");
             audio.loop = true;
             audio.volume = 0.5;
@@ -121,11 +104,6 @@
 
             (window as any).audioGlobal = audio;
             (window as any).estaReproduciendoGlobal = true;
-
-            // El botón flotante de música recién aparece al abrir el sobre
-            const wrapperMusica = document.getElementById("wrapper-musica");
-            wrapperMusica?.classList.remove("hidden");
-            wrapperMusica?.classList.add("flex");
 
             setTimeout(() => {
                 const iconoPlay = document.getElementById("icono-play-global");
