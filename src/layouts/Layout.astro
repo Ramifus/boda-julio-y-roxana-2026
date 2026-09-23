@@ -16,6 +16,19 @@ const { title } = Astro.props;
     <link rel="icon" type="image/png" href="/iconos/Anillos.png" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+
+    <!-- Vista previa al compartir el link (WhatsApp) -->
+    <meta name="description" content="Sábado 10 de octubre de 2026" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Julio & Roxana" />
+    <meta property="og:description" content="Sábado 10 de octubre de 2026" />
+    <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)} />
+    <meta property="og:image" content={new URL("/imagenes/miniatura.jpg", Astro.site)} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="632" />
+    <meta property="og:locale" content="es_ES" />
+    <meta name="twitter:card" content="summary_large_image" />
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
