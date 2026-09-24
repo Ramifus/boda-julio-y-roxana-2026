@@ -1,8 +1,9 @@
 ---
 // src/components/Invitacion.astro
-// Contenido completo de la invitación. Recibe el invitado como props para que
-// tanto la invitación genérica (/) como las personalizadas (/[slug]/) usen
-// exactamente el mismo diseño.
+// Contenido completo de la invitación. Se construye siempre en su versión
+// genérica: el nombre y los pases del invitado NO viajan en el link, llegan
+// desde el panel (Supabase) según el código ?i= y los pintan los scripts de
+// TarjetaInvitado y TarjetaConfirmar.
 interface Props {
   /** Nombre del invitado. Si va vacío o null, se muestra la versión genérica. */
   nombre?: string | null;
@@ -12,11 +13,8 @@ interface Props {
 
 const { nombre = null, pases = 1 } = Astro.props;
 
-// TEMPORAL: invitado de muestra para ver el diseño hasta conectar la base de datos
-const nombreMuestra = nombre ?? "Lincon Sánchez y Esposa";
-const pasesMuestra = nombre ? pases : 2;
-
 import Layout from "../layouts/Layout.astro";
+import LinkNoDisponible from "./LinkNoDisponible.astro";
 import Portada from "./Portada.astro";
 import NombresFlores from "./NombresFlores.astro";
 import Dedicatoria from "./Dedicatoria.astro";
@@ -36,6 +34,8 @@ import Versiculo from "./versiculo.astro";
 ---
 
 <Layout title="Julio & Roxana">
+    <LinkNoDisponible />
+
     <Portada />
 
     <div id="contenido-principal">
@@ -55,7 +55,7 @@ import Versiculo from "./versiculo.astro";
                     class="relative z-0 w-[82%] mx-auto"
                     style="margin-top: 16px;"
                 >
-                    <TarjetaInvitado nombre={nombreMuestra} pases={pasesMuestra} />
+                    <TarjetaInvitado nombre={nombre} pases={pases} />
                 </div>
 
                 <!-- 3. APARTA LA FECHA + CUENTA REGRESIVA — izquierda -->
@@ -159,7 +159,7 @@ import Versiculo from "./versiculo.astro";
                     class="relative z-[10] w-[58%] ml-auto"
                     style="margin-top: -100px;"
                 >
-                    <TarjetaConfirmar nombre={nombreMuestra} pases={pasesMuestra} />
+                    <TarjetaConfirmar nombre={nombre} pases={pases} />
                 </div>
 
                 <!-- 12b. FOTO HORIZONTAL — debajo de confirmar asistencia -->

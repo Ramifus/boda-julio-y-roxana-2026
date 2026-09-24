@@ -1,6 +1,8 @@
 ---
 // Confirmación de asistencia — un botón abre el formulario con el nombre del
-// invitado y sus pases. Por ahora es solo diseño: todavía no guarda nada.
+// invitado y sus pases. La respuesta se guarda en el panel (Supabase), en la
+// fila del invitado del link (?i=). Sin código en el link no hay nombre que
+// mostrar: el nombre y los pases de la ventana quedan ocultos.
 import { etiquetaPases } from "../lib/pases";
 
 interface Props {
@@ -9,6 +11,9 @@ interface Props {
 }
 
 const { nombre = null, pases = 1 } = Astro.props;
+
+const esGenerica = !nombre || nombre.trim() === "";
+const ocultoSiGenerica = esGenerica ? "display: none;" : undefined;
 ---
 
 <div class="tarjeta-confirmar w-full">
@@ -84,16 +89,16 @@ const { nombre = null, pases = 1 } = Astro.props;
           <div class="flex-1 h-px bg-[#c8b194]"></div>
         </div>
 
-        <p class="font-cormorant text-[13px] text-[#c8b194] uppercase tracking-[0.28em] mb-2">Invitación para</p>
-        <p class="font-soage text-[1.3rem] leading-tight text-[#4d5441] mb-4">{nombre}</p>
+        <p id="para-modal" class="font-cormorant text-[13px] text-[#c8b194] uppercase tracking-[0.28em] mb-2" style={ocultoSiGenerica}>Invitación para</p>
+        <p id="nombre-modal" class="font-soage text-[1.3rem] leading-tight text-[#4d5441] mb-4" style={ocultoSiGenerica}>{esGenerica ? "" : nombre}</p>
 
-        <div class="inline-flex items-center gap-2.5 border border-[#c8b194]/60 rounded-full px-6 py-2 mb-5">
+        <div id="caja-pases-modal" class="inline-flex items-center gap-2.5 border border-[#c8b194]/60 rounded-full px-6 py-2 mb-5" style={ocultoSiGenerica}>
           <svg class="w-5 h-5 text-[#c8b194]" fill="currentColor" viewBox="0 0 24 24">
             <path d="M20 6h-2.18A3 3 0 0 0 18 5a3 3 0 0 0-5.24-2A5.6 5.6 0 0 0 12 3.9a5.6 5.6 0 0 0-.76-.9A3 3 0 0 0 6 5a3 3 0 0 0 .18 1H4a2 2 0 0 0-2 2v2a1 1 0 0 0 1 1v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a1 1 0 0 0 1-1V8a2 2 0 0 0-2-2Zm-5-2a1 1 0 1 1 0 2h-1.6C13.7 4.9 14.3 4 15 4ZM8 5a1 1 0 0 1 1-1c.7 0 1.3.9 1.6 2H9a1 1 0 0 1-1-1Zm3 14H5v-7h6Zm0-9H4V8h7Zm8 9h-6v-7h6Zm1-9h-7V8h7Z"/>
           </svg>
           <p class="font-cormorant text-base text-[#c8b194] uppercase tracking-[0.18em] font-semibold">
-            <span class="pases-modal">{pases}</span>
-            <span>{etiquetaPases(pases)}</span>
+            <span id="numero-pases-modal" class="pases-modal">{pases}</span>
+            <span id="palabra-pases-modal">{etiquetaPases(pases)}</span>
           </p>
         </div>
 
@@ -115,7 +120,7 @@ const { nombre = null, pases = 1 } = Astro.props;
           </div>
         </div>
 
-        <!-- Respuestas (solo visual por ahora) -->
+        <!-- Agradecimiento después de responder -->
         <div class="paso-si hidden">
           <p class="font-crimson italic text-lg text-[#4d5441] leading-snug">
             ¡Gracias por confirmar!<br/>Te esperamos con mucho cariño.
@@ -143,6 +148,14 @@ const { nombre = null, pases = 1 } = Astro.props;
 <script>
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import { etiquetaPases } from "../lib/pases";
+  import {
+    codigoDelLink,
+    datosInvitado,
+    confirmarAsistencia,
+    alCambiarInvitado,
+    type Invitado,
+  } from "../lib/invitado";
   gsap.registerPlugin(ScrollTrigger);
   gsap.fromTo(".tarjeta-confirmar",
     { opacity: 0, y: 40 },
@@ -205,34 +218,143 @@ const { nombre = null, pases = 1 } = Astro.props;
       if (e.key === "Escape" && !modal.classList.contains("hidden")) cerrarModal();
     });
 
-    // Por ahora la respuesta solo se recuerda mientras la página está abierta;
-    // más adelante se guardará en la base de datos.
+    // ═══ RESPUESTA GUARDADA EN EL PANEL ═══
+    // Se guarda en la fila del invitado del link (?i=k7m2p): nadie puede
+    // responder por otro. Si ya había respondido, al cargar la página se
+    // ven los dos avisos (tarjeta y ventana).
     const aviso = document.getElementById("aviso-confirmar");
     const avisoTexto = aviso?.querySelector(".aviso-texto");
     const avisoModal = modal.querySelector(".aviso-modal");
+    const botones = Array.from(
+      modal.querySelectorAll<HTMLButtonElement>("[data-respuesta]"),
+    );
 
-    const TEXTO_AVISO = {
+    type Respuesta = "si" | "no";
+
+    const TEXTO_AVISO: Record<Respuesta, string> = {
       si: "Ya confirmaste tu asistencia",
       no: "Nos avisaste que no podrás asistir",
     };
 
-    modal.querySelectorAll("[data-respuesta]").forEach((boton) => {
-      boton.addEventListener("click", () => {
-        const respuesta = (boton as HTMLElement).dataset.respuesta === "si" ? "si" : "no";
-        mostrarPaso(respuesta === "si" ? pasoSi : pasoNo);
+    const TEXTO_ERROR =
+      "No pudimos guardar tu respuesta. Revisa tu conexión e inténtalo de nuevo.";
 
-        // Debajo del botón de la tarjeta
-        if (aviso && avisoTexto) {
+    const hayCodigo = Boolean(codigoDelLink());
+    let pasesActuales: number | null = null;
+    let guardando = false;
+
+    // Muestra (o esconde, con null) lo que ya respondió
+    const pintarAviso = (respuesta: Respuesta | null) => {
+      if (aviso && avisoTexto) {
+        if (respuesta) {
           avisoTexto.textContent = TEXTO_AVISO[respuesta];
           aviso.classList.remove("hidden");
           aviso.classList.add("flex");
+        } else {
+          aviso.classList.add("hidden");
+          aviso.classList.remove("flex");
         }
-
-        // Si vuelve a abrir el formulario, se le recuerda lo que respondió
-        if (avisoModal) {
+      }
+      if (avisoModal) {
+        if (respuesta) {
           avisoModal.textContent = `${TEXTO_AVISO[respuesta]}. Si quieres, puedes cambiar tu respuesta.`;
           avisoModal.classList.remove("hidden");
+        } else {
+          avisoModal.classList.add("hidden");
         }
+      }
+    };
+
+    const mostrarBloque = (id: string, visible: boolean) => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = visible ? "" : "none";
+    };
+
+    const pintarInvitado = (inv: Invitado | null) => {
+      if (!inv) return;
+      const funciones = (inv.funciones ?? {}) as Record<string, unknown>;
+
+      // Si la boda no tiene la confirmación contratada, la tarjeta sobra
+      const tarjeta = document.querySelector<HTMLElement>(".tarjeta-confirmar");
+      if (funciones.confirmacion === false) {
+        if (tarjeta) tarjeta.style.display = "none";
+        if (!modal.classList.contains("hidden")) cerrarModal();
+        return;
+      }
+      if (tarjeta) tarjeta.style.display = "";
+
+      // Nombre en la ventana
+      const nombre = (inv.nombre ?? "").trim();
+      if (nombre) {
+        const el = document.getElementById("nombre-modal");
+        if (el) el.textContent = nombre;
+        mostrarBloque("para-modal", true);
+        mostrarBloque("nombre-modal", true);
+      }
+
+      // Pases en la ventana (si la boda no usa pases, no se inventa uno)
+      if (funciones.pases === false) {
+        mostrarBloque("caja-pases-modal", false);
+      } else if (Number.isInteger(inv.pases) && inv.pases > 0) {
+        pasesActuales = inv.pases;
+        const num = document.getElementById("numero-pases-modal");
+        const palabra = document.getElementById("palabra-pases-modal");
+        if (num) num.textContent = String(inv.pases);
+        if (palabra) palabra.textContent = etiquetaPases(inv.pases);
+        mostrarBloque("caja-pases-modal", true);
+      }
+
+      // Lo que dice la base sobre su respuesta (también si los novios la
+      // corrigen desde el panel). Mientras se guarda no se pisa.
+      if (!guardando) {
+        pintarAviso(
+          inv.confirmado === true ? "si" : inv.confirmado === false ? "no" : null,
+        );
+      }
+    };
+
+    datosInvitado().then(pintarInvitado);
+    alCambiarInvitado(pintarInvitado);
+
+    const TEXTO_BOTON = new Map(botones.map((b) => [b, b.textContent ?? ""]));
+
+    botones.forEach((boton) => {
+      boton.addEventListener("click", async () => {
+        if (guardando) return;
+        const respuesta: Respuesta = boton.dataset.respuesta === "si" ? "si" : "no";
+
+        // Con código en el link, la respuesta se guarda en el panel. Solo se
+        // agradece si de verdad quedó guardada: si no, los novios nunca se
+        // enterarían y el invitado creería que ya respondió.
+        if (hayCodigo) {
+          guardando = true;
+          botones.forEach((b) => (b.disabled = true));
+          boton.textContent = "Enviando...";
+
+          const fila =
+            respuesta === "si"
+              ? await confirmarAsistencia(true, pasesActuales ?? undefined)
+              : await confirmarAsistencia(false);
+
+          guardando = false;
+          botones.forEach((b) => {
+            b.disabled = false;
+            b.textContent = TEXTO_BOTON.get(b) ?? b.textContent;
+          });
+
+          if (!fila) {
+            if (avisoModal) {
+              avisoModal.textContent = TEXTO_ERROR;
+              avisoModal.classList.remove("hidden");
+            }
+            return;
+          }
+        }
+
+        mostrarPaso(respuesta === "si" ? pasoSi : pasoNo);
+
+        // Debajo del botón de la tarjeta y dentro de la ventana
+        pintarAviso(respuesta);
 
         // Deja leer el agradecimiento y cierra, para que se vea el aviso
         clearTimeout(cierreAutomatico);
